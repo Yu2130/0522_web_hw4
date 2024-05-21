@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>價格追蹤器</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid black;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+<h1>價格追蹤器</h1>
+<input type="text" id="searchQuery" placeholder="輸入產品名稱進行搜索...">
+<button onclick="searchPrices()">搜索</button>
+<table id="resultsTable">
+  <thead>
+  <tr>
+    <th>日期</th>
+    <th>產品名稱</th>
+    <th>金額</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!-- 搜索結果將插入此處 -->
+  </tbody>
+</table>
+
+<script>
+  async function searchPrices() {
+    const query = document.getElementById('searchQuery').value;
+    try {
+      const response = await fetch(`/prices?query=${query}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const prices = await response.json();
+
+      const tableBody = document.getElementById('resultsTable').getElementsByTagName('tbody')[0];
+      tableBody.innerHTML = ''; // 清除上一次的搜索結果
+
+      prices.forEach(price => {
+        const row = tableBody.insertRow();
+        const dateCell = row.insertCell(0);
+        const itemNameCell = row.insertCell(1);
+        const priceCell = row.insertCell(2);
+
+        dateCell.textContent = price.date;
+        itemNameCell.textContent = price.item_name;
+        priceCell.textContent = price.price;
+      });
+    } catch (error) {
+      console.error('Fetch error:', error);
+    }
+  }
+</script>
+</body>
+</html>
